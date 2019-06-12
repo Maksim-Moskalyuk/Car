@@ -31,6 +31,7 @@ public class CarController {
         modelAndView.addObject("carsList", cars);
         modelAndView.addObject("carsCount", carsCount);
         modelAndView.addObject("pagesCount", pagesCount);
+        this.page = page;
         return modelAndView;
     }
 
@@ -52,8 +53,14 @@ public class CarController {
     @RequestMapping(value = "/edit", method = RequestMethod.POST)
     public ModelAndView editCar(@ModelAttribute("car") Car car) {
         ModelAndView modelAndView = new ModelAndView();
-        modelAndView.setViewName("redirect:/");
-        carService.edit(car);
+        if (carService.checkState_Number(car.getState_number()) || carService.getById(car.getId()).getState_number().equals(car.getState_number())) {
+            modelAndView.setViewName("redirect:/");
+            modelAndView.addObject("page", page);
+            carService.edit(car);
+        } else {
+            modelAndView.addObject("message","part with title \"" + car.getState_number() + "\" already exists");
+            modelAndView.setViewName("redirect:/edit/" +  + car.getId());
+        }
         return modelAndView;
     }
 
@@ -81,7 +88,11 @@ public class CarController {
     @RequestMapping(value="/delete/{id}", method = RequestMethod.GET)
     public ModelAndView deleteCar(@PathVariable("id") int id) {
         ModelAndView modelAndView = new ModelAndView();
+        int carsCount = carService.carsCount();
+        int page = ((carsCount - 1) % 10 == 0 && carsCount > 10 && this.page == (carsCount + 9)/10) ?
+                this.page - 1 : this.page;
         modelAndView.setViewName("redirect:/");
+        modelAndView.addObject("page", page);
         Car car = carService.getById(id);
         carService.delete(car);
         return modelAndView;
