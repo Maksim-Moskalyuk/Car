@@ -43,6 +43,7 @@ public class CarServiceImpl implements CarService {
     }
 
     @Override
+    @Transactional
     public Car getById(int id) {
         return carDAO.getById(id);
     }
@@ -55,6 +56,7 @@ public class CarServiceImpl implements CarService {
     }
 
     @Override
+    @Transactional
     public boolean checkState_Number(String state_number) {
         return carDAO.checkState_Number(state_number);
     }
